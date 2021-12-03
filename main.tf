@@ -173,7 +173,7 @@ resource "aws_launch_template" "ng" {
   name          = format("eks-%s", uuid())
   tags          = merge(local.default-tags, local.eks-tag, var.tags)
   image_id      = length(regexall("^AL2", lookup(each.value, "ami_type", "AL2_x86_64"))) > 0 ? data.aws_ami.eks[each.key].id : data.aws_ami.br[each.key].id
-  user_data     = base64encode(length(regexall("^AL2", lookup(each.value, "ami_type", "AL2_x86_64"))) > 0 ? data.cloudinit_config.ng[each.key].rendered : template_br)
+  user_data     = base64encode(length(regexall("^AL2", lookup(each.value, "ami_type", "AL2_x86_64"))) > 0 ? data.cloudinit_config.ng[each.key].rendered : local.template_br)
   instance_type = lookup(each.value, "instance_type", "t3.medium")
 
   iam_instance_profile {

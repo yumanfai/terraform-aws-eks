@@ -53,7 +53,7 @@ output "kubeconfig" {
 }
 
 data "aws_eks_cluster_auth" "cp" {
-  name = aws_eks_cluster.cp.name
+  name = aws_eks_cluster.cp.id
 }
 
 output "helmconfig" {

@@ -165,7 +165,7 @@ locals {
     admin_container_enabled      = false
     admin_container_superpowered = false
     admin_container_source       = ""
-  }
+  })
 }
 
 resource "aws_launch_template" "ng" {

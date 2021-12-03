@@ -134,7 +134,7 @@ data "aws_ami" "br" {
   }
 }
 
-data "template_cloudinit_config" "ng" {
+data "cloudinit_config" "ng" {
   for_each      = { for ng in var.node_groups : ng.name => ng }
   base64_encode = true
   gzip          = false
@@ -157,10 +157,8 @@ data "template_cloudinit_config" "ng" {
   }
 }
 
-data "template_file" "br" {
-  for_each = { for ng in var.node_groups : ng.name => ng }
-  template = file("${path.module}/templates/bottlerocket.tpl")
-  vars = {
+locals {
+  template_br = templatefile("${path.module}/templates/bottlerocket.tpl", {
     cluster_name                 = aws_eks_cluster.cp.name
     cluster_endpoint             = aws_eks_cluster.cp.endpoint
     cluster_ca_data              = aws_eks_cluster.cp.certificate_authority.0.data
@@ -175,7 +173,7 @@ resource "aws_launch_template" "ng" {
   name          = format("eks-%s", uuid())
   tags          = merge(local.default-tags, local.eks-tag, var.tags)
   image_id      = length(regexall("^AL2", lookup(each.value, "ami_type", "AL2_x86_64"))) > 0 ? data.aws_ami.eks[each.key].id : data.aws_ami.br[each.key].id
-  user_data     = base64encode(length(regexall("^AL2", lookup(each.value, "ami_type", "AL2_x86_64"))) > 0 ? data.template_cloudinit_config.ng[each.key].rendered : data.template_file.br[each.key].rendered)
+  user_data     = base64encode(length(regexall("^AL2", lookup(each.value, "ami_type", "AL2_x86_64"))) > 0 ? data.cloudinit_config.ng[each.key].rendered : template_br)
   instance_type = lookup(each.value, "instance_type", "t3.medium")
 
   iam_instance_profile {
@@ -290,7 +288,7 @@ resource "aws_autoscaling_group" "ng" {
 
 # Render a multi-part cloud-init config making use of the part
 # above, and other source files
-data "template_cloudinit_config" "mng" {
+data "cloudinit_config" "mng" {
   for_each      = { for ng in var.managed_node_groups : ng.name => ng }
   base64_encode = true
   gzip          = false
@@ -309,7 +307,7 @@ resource "aws_launch_template" "mng" {
   for_each  = { for ng in var.managed_node_groups : ng.name => ng }
   name      = format("eks-%s", uuid())
   tags      = merge(local.default-tags, local.eks-tag, var.tags)
-  user_data = data.template_cloudinit_config.mng[each.key].rendered
+  user_data = data.cloudinit_config.mng[each.key].rendered
 
   block_device_mappings {
     device_name = "/dev/xvda"

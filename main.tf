@@ -426,11 +426,11 @@ data "aws_eks_cluster_auth" "cp" {
   depends_on = [aws_eks_cluster.cp, time_sleep.wait]
 }
 
-provider "kubernetes" {
-  host                   = aws_eks_cluster.cp.endpoint
-  token                  = data.aws_eks_cluster_auth.cp.token
-  cluster_ca_certificate = base64decode(aws_eks_cluster.cp.certificate_authority.0.data)
-}
+# provider "kubernetes" {
+#   host                   = aws_eks_cluster.cp.endpoint
+#   token                  = data.aws_eks_cluster_auth.cp.token
+#   cluster_ca_certificate = base64decode(aws_eks_cluster.cp.certificate_authority.0.data)
+# }
 
 resource "time_sleep" "wait" {
   count           = ((local.managed_node_groups_enabled || local.fargate_enabled) ? 0 : (local.node_groups_enabled ? 1 : 0))
@@ -438,21 +438,21 @@ resource "time_sleep" "wait" {
   depends_on      = [aws_eks_cluster.cp, ]
 }
 
-resource "kubernetes_config_map" "aws-auth" {
-  count      = ((local.managed_node_groups_enabled || local.fargate_enabled) ? 0 : (local.node_groups_enabled ? 1 : 0))
-  depends_on = [time_sleep.wait]
-  metadata {
-    name      = "aws-auth"
-    namespace = "kube-system"
-  }
+# resource "kubernetes_config_map" "aws-auth" {
+#   count      = ((local.managed_node_groups_enabled || local.fargate_enabled) ? 0 : (local.node_groups_enabled ? 1 : 0))
+#   depends_on = [time_sleep.wait]
+#   metadata {
+#     name      = "aws-auth"
+#     namespace = "kube-system"
+#   }
 
-  data = {
-    mapRoles = yamlencode(
-      [{
-        rolearn  = element(compact(aws_iam_role.ng.*.arn), 0)
-        username = "system:node:{{EC2PrivateDNSName}}"
-        groups   = ["system:bootstrappers", "system:nodes"]
-      }],
-    )
-  }
-}
+#   data = {
+#     mapRoles = yamlencode(
+#       [{
+#         rolearn  = element(compact(aws_iam_role.ng.*.arn), 0)
+#         username = "system:node:{{EC2PrivateDNSName}}"
+#         groups   = ["system:bootstrappers", "system:nodes"]
+#       }],
+#     )
+#   }
+# }

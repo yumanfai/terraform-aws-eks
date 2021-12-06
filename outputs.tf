@@ -52,10 +52,6 @@ output "kubeconfig" {
   ])
 }
 
-data "aws_eks_cluster_auth" "cp" {
-  name = aws_eks_cluster.cp.id
-}
-
 output "helmconfig" {
   description = "The configurations map for Helm provider"
   sensitive   = true

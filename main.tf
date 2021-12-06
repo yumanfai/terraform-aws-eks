@@ -421,11 +421,6 @@ locals {
   }
 }
 
-data "aws_eks_cluster_auth" "cp" {
-  name = aws_eks_cluster.cp.id
-  depends_on = [aws_eks_cluster.cp, time_sleep.wait]
-}
-
 provider "kubernetes" {
   host                   = aws_eks_cluster.cp.endpoint
   token                  = data.aws_eks_cluster_auth.cp.token

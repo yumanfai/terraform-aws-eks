@@ -17,12 +17,16 @@ module "irsa" {
   tags           = var.tags
 }
 
+data "http" "iam_policy" {
+  url = "https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/main/docs/install/iam_policy.json"
+}
+
 resource "aws_iam_policy" "lbc" {
   count       = var.enabled ? 1 : 0
   name        = local.name
   description = format("Allow aws-load-balancer-controller to manage AWS resources")
   path        = "/"
-  policy      = file("${path.module}/policy.json")
+  policy      = data.http.iam_policy.body
 }
 
 resource "helm_release" "lbc" {

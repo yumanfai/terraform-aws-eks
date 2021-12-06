@@ -41,16 +41,16 @@ output "tags" {
 
 data "aws_region" "current" {}
 
-# output "kubeconfig" {
-#   description = "Bash script to update kubeconfig file"
-#   value = join(" ", [
-#     "bash -e",
-#     format("%s/script/update-kubeconfig.sh", path.module),
-#     format("-r %s", data.aws_region.current.name),
-#     format("-n %s", aws_eks_cluster.cp.name),
-#     "-k kubeconfig",
-#   ])
-# }
+output "kubeconfig" {
+  description = "Bash script to update kubeconfig file"
+  value = join(" ", [
+    "bash -e",
+    format("%s/script/update-kubeconfig.sh", path.module),
+    format("-r %s", data.aws_region.current.name),
+    format("-n %s", aws_eks_cluster.cp.name),
+    "-k kubeconfig",
+  ])
+}
 
 output "helmconfig" {
   description = "The configurations map for Helm provider"

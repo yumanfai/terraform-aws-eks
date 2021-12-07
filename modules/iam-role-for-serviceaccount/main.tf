@@ -20,11 +20,6 @@ resource "aws_iam_role" "irsa" {
           format("%s:sub", var.oidc_url) = local.oidc_fully_qualified_subjects
         }
       }
-      Condition = {
-        StringEquals = {
-          format("%s:aud", var.oidc_url) = "sts.amazonaws.com"
-        }
-      }
     }]
     Version = "2012-10-17"
   })

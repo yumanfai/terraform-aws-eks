@@ -13,7 +13,7 @@ module "irsa" {
   serviceaccount = local.serviceaccount
   oidc_url       = var.oidc.url
   oidc_arn       = var.oidc.arn
-  policy_arns    = [aws_iam_policy.lbc.0.arn]
+  policy_arns    = [aws_iam_policy.lbc.0.arn, "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"]
   tags           = var.tags
 }
 

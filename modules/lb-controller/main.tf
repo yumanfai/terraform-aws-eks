@@ -50,3 +50,13 @@ resource "helm_release" "lbc" {
     }
   }
 }
+
+# install the TargetGroupBinding CRDs
+data "kustomization" "crd" {
+  path = "github.com/aws/eks-charts/stable/aws-load-balancer-controller//crds?ref=master"
+}
+
+resource "kustomization_resource" "crd" {
+  for_each = data.kustomization.crd.ids
+  manifest = data.kustomization.crd.manifests[each.value]
+}

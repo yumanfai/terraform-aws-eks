@@ -4,11 +4,6 @@ variable "enabled" {
   default     = true
 }
 
-variable "kubeconfig" {}
-variable "kubeconfig_path" {
-  default = "~/.kube/config"
-}
-
 ### helm
 variable "helm" {
   description = "The helm release configuration"
